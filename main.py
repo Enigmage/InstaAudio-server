@@ -22,6 +22,7 @@ def index():
 
 @app.post("/convert")
 def handle_input(req: UserInput):
+    print("request")
     if not req.link and not req.file:
         raise HTTPException(status_code=400, detail="No input provided")
     if req.link:
@@ -29,6 +30,7 @@ def handle_input(req: UserInput):
         summary = nlp_summarizer(text, formatted_text)
         output_path = generate_audio(summary)
         if output_path:
+            print("Complete")
             return FileResponse(output_path)
         raise HTTPException(
             status_code=500, detail="Output audio generation failed from url"

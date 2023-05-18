@@ -21,7 +21,7 @@ def generate_audio(text: str) -> Optional[str]:
     try:
         # Request speech synthesis
         response = polly.synthesize_speech(
-            Text=text, OutputFormat="mp3", VoiceId="Ruth", Engine="neural"
+            Text=text, OutputFormat="mp3", VoiceId="Joanna"
         )
     except (BotoCoreError, ClientError) as error:
         # The service returned an error, exit gracefully
