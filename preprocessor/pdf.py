@@ -1,7 +1,17 @@
+from io import BytesIO
 import re
+import PyPDF2
 
 
-def preprocess_text(text):
+def pdf_extract_text(pdf_file: BytesIO) -> str:
+    pdf_reader = PyPDF2.PdfReader(pdf_file)
+    text = ""
+    for page in pdf_reader.pages:
+        text += page.extract_text()
+    return text
+
+
+def pdf_preprocess_text(text: str) -> str:
     # Remove footers and headers based on patterns or keywords
     footer_patterns = [
         r"^\d+\s*\|",  # Remove lines starting with numbers followed by a pipe symbol

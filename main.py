@@ -1,13 +1,11 @@
 from typing import Optional
 import io
-import PyPDF2
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
 from pydantic import BaseModel
-from preprocessor import link_extractor
-from preprocessor import preprocess_text
-from summarizer import nlp_summarizer
+from preprocessor import pdf_preprocess_text, pdf_extract_text, url_preprocess_text
+from summarizer import extractive_summarizer, abstractive_summarizer
 from tts import generate_audio
 
 
@@ -16,23 +14,17 @@ app = FastAPI()
 
 @app.post("/convert-file")
 async def index(file: Optional[UploadFile] = None):
-    print("request")
+    print("request received")
     if file:
-        # print("In")
         pdf_content = await file.read()
         pdf_file = io.BytesIO(pdf_content)
 
-        pdf_reader = PyPDF2.PdfReader(pdf_file)
-        text = ""
-        for page in pdf_reader.pages:
-            text += page.extract_text()
+        filtered_text = pdf_preprocess_text(pdf_extract_text(pdf_file))
 
-        filtered_text = preprocess_text(text)
-
-        output_path = generate_audio(filtered_text)
+        output_path = generate_audio(abstractive_summarizer(filtered_text))
 
         if output_path:
-            print("Complete")
+            print("success")
             return FileResponse(output_path)
         raise HTTPException(
             status_code=500, detail="Output audio generation failed from document"
@@ -46,13 +38,14 @@ class UrlInput(BaseModel):
 
 @app.post("/convert-url")
 def handle_input(req: UrlInput):
-    print("request")
+    print("request received")
     if req.url:
-        text, formatted_text = link_extractor(req.url)
-        summary = nlp_summarizer(text, formatted_text)
+        text, formatted_text = url_preprocess_text(req.url)
+        summary = extractive_summarizer(text, formatted_text)
+        # summary = abstractive_summarizer(text)
         output_path = generate_audio(summary)
         if output_path:
-            print("Complete")
+            print("success")
             return FileResponse(output_path)
         raise HTTPException(
             status_code=500, detail="Output audio generation failed from url"

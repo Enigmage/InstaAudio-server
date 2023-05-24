@@ -20,6 +20,9 @@ polly = session.client("polly")
 def generate_audio(text: str) -> Optional[str]:
     try:
         # Request speech synthesis
+        # response = polly.synthesize_speech(
+        #     Text=text, OutputFormat="mp3", VoiceId="Ruth", Engine="neural"
+        # )
         response = polly.synthesize_speech(
             Text=text, OutputFormat="mp3", VoiceId="Joanna"
         )
