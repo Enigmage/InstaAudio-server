@@ -16,6 +16,8 @@
         buildInputs = with pkgs; [
           python311
           python311Packages.pip
+          neovim
+          git
         ];
         LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
       };
